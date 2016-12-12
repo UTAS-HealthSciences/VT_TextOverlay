@@ -1,0 +1,44 @@
+<plugin id="UTAS_PTPPlugin_CustomTextOverlay"
+        category="tr:UTAS"
+        name="tr:Custom Text Overlay"
+        version="0.1"
+        isGraphical="true"
+        multipleInstance="true"
+        description="tr:Adds custom text to screen"
+        author="Connor Deckers (cdeckers) 2016"
+        authorUrl="connor.deckers@utas.edu.au">
+
+        <parameters>
+          <group id="display" name="tr: Display">
+            <row id="position">
+              <position id="myPosition" name="Position" default="topleft" availableValues="topleft,topright,bottomleft,bottomright,bottom,top,left,right,center"/>
+            </row>
+          </group>
+          <group id="fonts" name="tr: Font Style">
+            <row id="font">
+              <font id="font" name="tr:Font family" details="tr: Choose font family" default="Calibri" size="20" style="normal" />
+            </row>
+            <row id="fontcolour">
+              <color id="fontcolor" name="tr: Font color" default="#ffffff" needalpha="false" defaultalpha="1.0" />
+            </row>
+            <row id="fontshadow">
+              <bool id="fontshadow" name="tr: Display a shadow behind the text" default="true" />
+            </row>
+          </group>
+
+          <advanced id="advancedParams">
+            <group id="debug" name="tr: Debugging">
+              <row id="rDebug">
+                <bool id="consoleLog" name="tr: Log to console" details="tr: Log information to console during use." default="true" />
+              </row>
+            </group>
+          </advanced>
+
+        </parameters>
+
+        <templates>
+            <template url="visHS.tmpl" />
+            <template url="visHS_Bootstrap.tmpl"  type="jsbootstrap" />
+            <template url="visHS_BootstrapLoadEvent.tmpl" type="jsbootstraploaded" />
+        </templates>
+</plugin>
