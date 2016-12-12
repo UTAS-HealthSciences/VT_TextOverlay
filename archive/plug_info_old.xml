@@ -14,7 +14,7 @@
     <group id="display" name="tr:Display" >
       <string id="source" name="tr:Text to display" default="" />
       <font  id="font"  name="tr:Font style"  default="Calibri" size="20" style="normal" />
-      <color id="color" name="tr:Font color" default="#ffffff" needAlpha="true" defaultAlpha="1.0" source="currentProjectBackground"/>
+      <color id="color" name="tr:Font color" default="#ffffff" needAlpha="true" defaultAlpha="1.0" source="currentProjectForeground"/>
       <bool id="hasshadow"  name="tr:Drop shadow text" default="true" />
     </group>
     <group id="behavior" name="tr:Behavior">
@@ -23,8 +23,7 @@
   </parameters>
 
   <templates>
-      <template url="text.tmpl" />
-      <template url="textBS.tmpl"  type="jsbootstrap" />
-      <template url="textBSLE.tmpl" type="jsbootstraploaded" />
+      <template url="customTextField.tmpl" />
   </templates>
+
 </plugin>

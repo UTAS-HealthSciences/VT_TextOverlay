@@ -1,0 +1,68 @@
+{% if displaycomments %}
+<!-- ********** -->
+<!-- {{p.name|commentsafe}} -->
+<!-- id : {{p.id}} -->
+<!-- Custom version authored by Connor Deckers 2016 -->
+<!-- ********** -->
+{% endif %}
+
+{% with p.id as plugname %}
+  <events name="{{plugname}}_events"
+{% if project.hideControlsDuringIntroduction %}
+{% if not project.startWithControlsHidden %}
+    onTourStart="show{{plugname}}();"
+{% else %}
+{% if not p.hideonhidecontrols.value %}
+    onTourStart="show{{plugname}}();"
+{% endif %}
+{% endif %}
+{% else %}
+{% if not project.startWithControlsHidden %}
+    onxmlcomplete="show{{plugname}}();"
+{% else %}
+{% if not p.hideonhidecontrols.value %}
+    onxmlcomplete="show{{plugname}}();"
+{% endif %}
+{% endif %}
+{% endif %}
+{% if p.hideonhidecontrols.value %}
+    hidetourcontrols="hide{{plugname}}();"
+    showtourcontrols="show{{plugname}}();"
+{% endif %}
+    keep="true" />
+
+{% if p.hideonhidecontrols.value %}
+  <action name="hide{{plugname}}">set(layer[{{plugname}}].visible, false);</action>
+{% endif %}
+  <action name="show{{plugname}}">set(layer[{{plugname}}].visible, true );</action>
+
+  <layer name="{{plugname}}" keep="true" zorder="{{g_zorder}}"
+         url="%FIRSTXML%/{{pluginsDirectory}}/textfield.swf"
+         align="{{p.position.positionString}}" x="{{p.position.x}}" y="{{p.position.y}}" width="100%" autoheight="true"
+         onloaded="getmessage(text,{{p.source.value}});escape(text);"
+         background="false" capture="false" handcursor="false" selectable="false" enabled="false"
+         borderwidth="0"
+         alpha="{{p.color.alpha}}"
+         visible="false"
+{% if p.hasshadow.value %}
+         textshadow="1"
+{% endif %}
+         css="text-align:{% if p.position.alignedOnLeft %}left{% else %}{% if p.position.alignedOnRight %}right{% else %}center{% endif %}{% endif %};
+              color:#{{p.color.colorRRGGBB}};
+              font-family:{{p.font.family}};
+{% if p.font.italic %}
+              font-style:italic;
+{% endif %}
+{% if p.font.bold %}
+              font-weight:bold;
+{% endif %}
+{% if p.font.underline %}
+              text-decoration:underline;
+{% else %}
+{% if p.font.strikeout %}
+              text-decoration:line-through;
+{% endif %}
+{% endif %}
+              font-size:{{p.font.size}}px;"/>
+
+{% endwith %}

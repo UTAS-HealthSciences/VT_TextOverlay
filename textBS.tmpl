@@ -1,0 +1,178 @@
+/**
+* Name: Visited Hotspot Tracker
+* Author: Connor Deckers (cdeckers)
+* Date: 24 November 2016
+*/
+
+var _version = 0.01;
+
+/* Plugin-wide Object Manager */
+
+    //Initiates a container
+    var g = g || {};
+    var l = l || {};
+
+    //plugin-specific global-access plugin ID
+    g.ID = g.ID || '';
+    g.CSS = g.CSS || {};
+
+/* Properties Getter */
+    //Helper function to get properties
+    function ctf_getProp(property, type, pluginID)
+    {
+      if(typeof pluginID !== "string") { pluginID = g.ID; }
+      if(typeof property !== "string") { console.error("Error in getProp: property should be of type string. Type is " + typeof property); }
+      if(typeof type !== "string") { console.error("Error in getProp: type should be of type string. Type is " + typeof type); }
+
+      var preStr = "ptplugin["+pluginID+"].settings[0].option[";  /* Concat with necessary var */  var endStr = '].value';
+      var val = getKrValue(preStr+property+endStr, type);
+      return val;
+    }
+
+    function pano() {
+      return document.getElementById("krpanoSWFObject");
+    }
+
+/* Text Display */
+
+    /**
+     * Constructor function fired from Bootstrap Loader (textBSLE.tmpl)
+     * Sets initial variables and fires logic functions.
+     * @author cdeckers
+     * @version 1.0
+     * @date    2016-11-29
+     * @param   {String}   pID The plugin ID
+     * @param   {Integer}  pSuffix The plugin suffix (if multiple instances, otherwise empty string)
+     */
+
+    function displayText(pID)
+    {
+      g.ID = pID;
+      console.log(pID);
+      g.container = ctf_drawContainer();
+      ctf_insertContent(ctf_getProp("text", "string"));
+    }
+
+    //Draws container onto the screen, ready for content to be added
+    function ctf_drawContainer()
+    {
+      if(!$('#'+g.ID).length)
+      {
+        //Get the container draw settings.
+        var position = ctf_getProp('position', "string");
+        var margin_x = ctf_getProp('margin_x', "int");
+        var margin_y = ctf_getProp('margin_y', "int");
+
+        //Create the square
+        var textElem = document.createElement('div');
+        textElem.id = g.ID;
+
+        //Add the container of the square to the container of the tour
+        jQuery("#panoDIV").prepend(textElem);
+
+        jQuery(textElem).css({
+            'position': 'absolute',
+            'z-index': '3018',
+            'overflow': 'visible',
+            'opacity': '1',
+            'text-size-adjust': 'none',
+            'pointer-events': 'none',
+            'background': 'none',
+            'cursor': 'default',
+          });
+
+        var cssPosition = {};
+        var size = 2;
+        //Calculate the position
+        switch (position) {
+          case 'topleft':
+            cssPosition = { 'top': 0, 'left':0, 'margin-left': margin_x, 'margin-top': margin_y};
+            break;
+
+          case 'top':
+            cssPosition = { 'top': 0, 'left': '50%', 'margin-left': (size/2)+'px', 'margin-top': margin_y };
+            break;
+
+          case 'topright':
+            cssPosition = { 'top': 0, 'right': 0, 'margin-top': margin_y, 'margin-right': margin_x };
+            break;
+
+          case 'right':
+            cssPosition = { 'top': '50%', 'margin-top':(size/2)+'px', 'right':0, 'margin-right': margin_x };
+            break;
+
+          case 'bottomright':
+            cssPosition = { 'bottom': 0, 'right': 0, 'margin-right': margin_x, 'margin-bottom': margin_y };
+            break;
+
+          case 'bottom':
+            cssPosition = { 'bottom': 0, 'left': '50%', 'margin-left': (size/2)+'px', 'margin-bottom': margin_y }
+            break;
+
+          case 'bottomleft':
+            cssPosition = { 'bottom' : 0, 'left' : 0,  'margin-bottom': margin_y, 'margin-left': margin_x };
+            break;
+
+          case 'left':
+            cssPosition = {'left': 0, 'top': '50%', 'margin-top':(size/2)+'px', 'margin-left': margin_x }
+            break;
+
+          case 'center':
+            cssPosition = {'top': '50%', 'margin-top':(size/2)+'px', 'left': '50%', 'margin-left': (size/2)+'px'}
+            break;
+        }
+
+        //Apply the position
+        jQuery(textElem).css(cssPosition);
+
+        return textElem;
+      }
+      return $('#'+g.ID);
+    };
+
+    //Inserts the content into the onscreen box for the end-user to see
+    function ctf_insertContent(info)
+    {
+      $(g.container).html('<p class="'+g.ID+'text">'+info+'</p>');
+    }
+
+/* Style tag generator */
+
+    function ctf_createStylesheet()
+    {
+      var fColour = ktools.Color.hex2rgb(ctf_getProp("font_colour", "string"));
+      var fDecorate = (ctf_getProp("font_underline", "bool") ? "underline " : "") + (ctf_getProp("font_strikethrough", "bool") ? "strikethrough" : "");
+      var font = {
+        "font-family": ctf_getProp("font_family", "string"),
+        "font-weight": ctf_getProp("font_bold", "bool") ? "bold" : "normal",
+        "font-style": ctf_getProp("font_italics", "bool") ? "italic" : "normal",
+        "text-decoration":  fDecorate == "" ? "normal" : fDecorate.trim(),
+        "font-size": ctf_getProp("font_size", "int")+"px",
+        "color": "rgba("+fColour[0]+","+fColour[1]+","+fColour[2]+","+ctf_getProp("font_alpha", "float")+")",
+        "text-shadow": "rgb(0, 0, 0) 1px 1px 3.2px",
+      };
+      ctf_addStyle("."+g.ID+"text", font);
+      ctf_generateCSS();
+    }
+
+    function ctf_addStyle(identifier, rule)
+    {
+      if(g.CSS[identifier] == null) { g.CSS[identifier] = {}; }
+      $.extend(g.CSS[identifier], rule);
+    }
+
+    function ctf_generateCSS()
+    {
+      var rules = "";
+      $.each(g.CSS, function(id, props)
+      {
+        rules += id + " {\n";
+        $.each(props, function(property, rule) {
+          rules += "\t"+property+":"+rule+";\n";
+        });
+        rules += "}\n\n";
+      });
+
+      $("head").append("<style>"+rules+"</style>");
+
+    }

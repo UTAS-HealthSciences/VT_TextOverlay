@@ -1,0 +1,28 @@
+<ptplugin name="{{p.id}}" engine="textOverlay">
+	<settings>
+
+		<option name="position" value="{{ p.position.positionString }}" type="string" />
+		<option name="margin_x" value="{{ p.position.x }}" 							type="int" />
+		<option name="margin_y" value="{{ p.position.y }}"						 	type="int" />
+
+		<option name="font_family" 				value="{{ p.font.family }}" 				type="string" />
+		<option name="font_bold" 					value="{{ p.font.bold }}" 					type="bool" />
+		<option name="font_italics" 			value="{{ p.font.italic }}" 				type="bool" />
+		<option name="font_underline" 		value="{{ p.font.underline }}" 			type="bool" />
+		<option name="font_strikethrough" value="{{ p.font.strikethrough }}" 	type="bool" />
+		<option name="font_size" 					value="{{ p.font.size }}" 						type="int" />
+		<option name="font_colour" 				value="{{ p.color.colorRRGGBB }}" 		type="string" />
+		<option name="font_alpha" 				value="{{ p.color.alpha }}" 					type="float" />
+
+		<option name="font_shadow" 				value="{{ p.hasshadow.value }}" 		type="bool" />
+
+		<option name="data_dir" 		value="{{ dataDirectory }}" 		type="string" />
+		<option name="plugin_dir" 	value="{{ pluginDirectory }}" 	type="string" />
+
+		<option name="text"		value="{{ p.source.value }}" type="string" />
+
+		<option name="hideonhidecontrols" value="{{ p.hideonhidecontrols.value }}" type="bool" />
+		<option name="startWithControlsHidden" value="{{ project.startWithControlsHidden }}" type="bool" />
+
+	</settings>
+</ptplugin>
