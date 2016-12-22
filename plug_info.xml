@@ -26,5 +26,6 @@
       <template url="text.tmpl" />
       <template url="textBS.tmpl"  type="jsbootstrap" />
       <template url="textBSLE.tmpl" type="jsbootstraploaded" />
+      <template url="jsevents.tmpl" />
   </templates>
 </plugin>
