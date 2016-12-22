@@ -1,75 +1,122 @@
-/**
-* Name: Visited Hotspot Tracker
-* Author: Connor Deckers (cdeckers)
-* Date: 24 November 2016
-*/
+var textOverlay = (textOverlay !== undefined ? textOverlay : (function( $, undefined ) {
+  function plugin(args) {
+    var pub = {}; //Public facing functions and variables.
+    var priv = {}; //Helper container to hold known-private variables.
 
-var _version = 0.01;
+    var settings = {};
+    var defaults = {
+      id: '',
+      font: {
+        size: '12px',
+        family: 'Calibri',
+        decoration: 'none',
+        style: 'normal',
+        weight: 'normal',
+        color: 'white',
+        shadow: '',
+      },
+      position: 'topleft',
+      margin: {
+        x: 0,
+        y: 0,
+      },
+      parent: "#panoDIV",
+      text: '',
+      visibility: true,
+    }
 
-/* Plugin-wide Object Manager */
-
-    //Initiates a container
-    var g = g || {};
-    var l = l || {};
-
-    //plugin-specific global-access plugin ID
-    g.ID = g.ID || '';
-    g.CSS = g.CSS || {};
-
-/* Properties Getter */
-    //Helper function to get properties
-    function ctf_getProp(property, type, pluginID)
+    settings = $.extend(true, {}, defaults, args);
+    if(settings.id == '')
     {
-      if(typeof pluginID !== "string") { pluginID = g.ID; }
-      if(typeof property !== "string") { console.error("Error in getProp: property should be of type string. Type is " + typeof property); }
-      if(typeof type !== "string") { console.error("Error in getProp: type should be of type string. Type is " + typeof type); }
-
-      var preStr = "ptplugin["+pluginID+"].settings[0].option[";  /* Concat with necessary var */  var endStr = '].value';
-      var val = getKrValue(preStr+property+endStr, type);
-      return val;
+      console.error("Invalid ID set.");
+      return false;
     }
-
-    function pano() {
-      return document.getElementById("krpanoSWFObject");
-    }
-
-/* Text Display */
 
     /**
-     * Constructor function fired from Bootstrap Loader (textBSLE.tmpl)
-     * Sets initial variables and fires logic functions.
-     * @author cdeckers
-     * @version 1.0
-     * @date    2016-11-29
-     * @param   {String}   pID The plugin ID
-     * @param   {Integer}  pSuffix The plugin suffix (if multiple instances, otherwise empty string)
+     * Identifies the version of the plugin
+     * @type {Number}
      */
+    pub.version = 0.02;
 
-    function displayText(pID)
+   /*******************************
+    *       PUBLIC FUNCTIONS      *
+    *******************************/
+
+    /**
+     * Allows you to set the text after plugin initialization.
+     * @author cdeckers
+     * @version 0.1
+     * @date    2016-12-22
+     * @param   {string}   text The text to change the internal value to.
+     */
+    pub.setText = function(text)
     {
-      g.ID = pID;
-      g.container = ctf_drawContainer();
-      ctf_insertContent(ctf_getProp("text", "string"));
+      settings.text = text;
     }
 
-    //Draws container onto the screen, ready for content to be added
-    function ctf_drawContainer()
+    /**
+     * Display the text onscreen.
+     * @author cdeckers
+     * @version 0.1
+     * @date    2016-12-22
+     * @return  {void}
+     */
+    pub.display = function()
     {
-      if(!$('#'+g.ID).length)
-      {
-        //Get the container draw settings.
-        var position = ctf_getProp('position', "string");
-        var margin_x = ctf_getProp('margin_x', "int");
-        var margin_y = ctf_getProp('margin_y', "int");
+      priv.container = drawContainer();
+      insertContent(priv.container, settings.text);
+    }
 
+    /**
+     * Alias function of `display`, but allows text replacement input.
+     * Use without parameter as alais for `display`
+     * @author cdeckers
+     * @version 0.1
+     * @date    2016-12-22
+     * @param   {string}   text New text to display.
+     * @return  {void}
+     */
+    pub.update = function(text)
+    {
+      if(typeof text != "undefined") { settings.text = text; }
+      pub.display();
+    }
+
+    /**
+     * Allows the user to toggle the visibility of the text, for hooking into hide/show control events.
+     * If called without a state argument, it will return the items current visibility status.
+     * @author cdeckers
+     * @version 0.1
+     * @date    2016-12-22
+     * @param   {bool}   state The items visibility state (true; false;)
+     * @return  {bool}         Returns true if the item is successfully toggled.
+     */
+    pub.visible = function(state)
+    {
+      if(state === 'undefined') return settings.visibility;
+      if(priv.container === 'undefined') return null;
+      $(priv.container).css("display", state?"block":"none");
+      settings.visibility = state;
+      return true;
+    }
+
+    /*******************************
+     *      PRIVATE FUNCTIONS      *
+     *******************************/
+
+    //Draws container onto the screen, ready for content to be added
+    function drawContainer()
+    {
+      if($('#'+settings.id).length === 0)
+      {
         //Create the square
         var textElem = document.createElement('div');
-        textElem.id = g.ID;
+        textElem.id = settings.id;
 
         //Add the container of the square to the container of the tour
-        jQuery("#panoDIV").prepend(textElem);
+        $(settings.parent).prepend(textElem);
 
-        jQuery(textElem).css({
+        $(textElem).css({
             'position': 'absolute',
             'z-index': '3018',
             'overflow': 'visible',
@@ -83,37 +130,37 @@ var _version = 0.01;
         var cssPosition = {};
         var size = 2;
         //Calculate the position
-        switch (position) {
+        switch (settings.position) {
           case 'topleft':
-            cssPosition = { 'top': 0, 'left':0, 'margin-left': margin_x, 'margin-top': margin_y};
+            cssPosition = { 'top': 0, 'left':0, 'margin-left': settings.margin.x, 'margin-top': settings.margin.y};
             break;
 
           case 'top':
-            cssPosition = { 'top': 0, 'left': '50%', 'margin-left': (size/2)+'px', 'margin-top': margin_y };
+            cssPosition = { 'top': 0, 'left': '50%', 'margin-left': (size/2)+'px', 'margin-top': settings.margin.y };
             break;
 
           case 'topright':
-            cssPosition = { 'top': 0, 'right': 0, 'margin-top': margin_y, 'margin-right': margin_x };
+            cssPosition = { 'top': 0, 'right': 0, 'margin-top': settings.margin.y, 'margin-right': settings.margin.x };
             break;
 
           case 'right':
-            cssPosition = { 'top': '50%', 'margin-top':(size/2)+'px', 'right':0, 'margin-right': margin_x };
+            cssPosition = { 'top': '50%', 'margin-top':(size/2)+'px', 'right':0, 'margin-right': settings.margin.x };
             break;
 
           case 'bottomright':
-            cssPosition = { 'bottom': 0, 'right': 0, 'margin-right': margin_x, 'margin-bottom': margin_y };
+            cssPosition = { 'bottom': 0, 'right': 0, 'margin-right': settings.margin.x, 'margin-bottom': settings.margin.y };
             break;
 
           case 'bottom':
-            cssPosition = { 'bottom': 0, 'left': '50%', 'margin-left': (size/2)+'px', 'margin-bottom': margin_y }
+            cssPosition = { 'bottom': 0, 'left': '50%', 'margin-left': (size/2)+'px', 'margin-bottom': settings.margin.y }
             break;
 
           case 'bottomleft':
-            cssPosition = { 'bottom' : 0, 'left' : 0,  'margin-bottom': margin_y, 'margin-left': margin_x };
+            cssPosition = { 'bottom' : 0, 'left' : 0,  'margin-bottom': settings.margin.y, 'margin-left': settings.margin.x };
             break;
 
           case 'left':
-            cssPosition = {'left': 0, 'top': '50%', 'margin-top':(size/2)+'px', 'margin-left': margin_x }
+            cssPosition = {'left': 0, 'top': '50%', 'margin-top':(size/2)+'px', 'margin-left': settings.margin.x }
             break;
 
           case 'center':
@@ -122,48 +169,48 @@ var _version = 0.01;
         }
 
         //Apply the position
-        jQuery(textElem).css(cssPosition);
+        $(textElem).css(cssPosition);
 
-        return textElem;
+        createStylesheet();
+
+        return $(textElem);
       }
-      return $('#'+g.ID);
+      return $('#'+settings.id);
     };
 
-    //Inserts the content into the onscreen box for the end-user to see
-    function ctf_insertContent(info)
+    function insertContent(container, info)
     {
-      $(g.container).html('<p class="'+g.ID+'text">'+info+'</p>');
+      $(container).html('<p class="'+settings.id+'text">'+info+'</p>');
     }
 
-/* Style tag generator */
+    /* Style tag generator */
+    /* Can possibly be refactored into seperate script? */
 
-    function ctf_createStylesheet()
+    priv.CSS = {};
+    function createStylesheet()
     {
-      var fColour = ktools.Color.hex2rgb(ctf_getProp("font_colour", "string"));
-      var fDecorate = (ctf_getProp("font_underline", "bool") ? "underline " : "") + (ctf_getProp("font_strikethrough", "bool") ? "strikethrough" : "");
-      var font = {
-        "font-family": ctf_getProp("font_family", "string"),
-        "font-weight": ctf_getProp("font_bold", "bool") ? "bold" : "normal",
-        "font-style": ctf_getProp("font_italics", "bool") ? "italic" : "normal",
-        "text-decoration":  fDecorate == "" ? "normal" : fDecorate.trim(),
-        "font-size": ctf_getProp("font_size", "int")+"px",
-        "color": "rgba("+fColour[0]+","+fColour[1]+","+fColour[2]+","+ctf_getProp("font_alpha", "float")+")",
-        "text-shadow": "rgb(0, 0, 0) 1px 1px 3.2px",
-      };
-      ctf_addStyle("."+g.ID+"text", font);
-      ctf_generateCSS();
+      addStyle("."+settings.id+"text", {
+        "font-family":      settings.font.family,
+        "font-weight":      settings.font.weight,
+        "font-style":       settings.font.style,
+        "text-decoration":  settings.font.decoration,
+        "font-size":        settings.font.size + 'px',
+        "color":            settings.font.color,
+        "text-shadow":      settings.font.shadow,
+      });
+      generateCSS();
     }
 
-    function ctf_addStyle(identifier, rule)
+    function addStyle(identifier, rule)
     {
-      if(g.CSS[identifier] == null) { g.CSS[identifier] = {}; }
-      $.extend(g.CSS[identifier], rule);
+      if(priv.CSS[identifier] == null) { priv.CSS[identifier] = {}; }
+      $.extend(priv.CSS[identifier], rule);
     }
 
-    function ctf_generateCSS()
+    function generateCSS()
     {
       var rules = "";
-      $.each(g.CSS, function(id, props)
+      $.each(priv.CSS, function(id, props)
       {
         rules += id + " {\n";
         $.each(props, function(property, rule) {
@@ -173,5 +220,38 @@ var _version = 0.01;
       });
 
       $("head").append("<style>"+rules+"</style>");
-
     }
+
+    return pub;
+  }
+
+  var items = {};
+  function manager() {
+    var pub = {};
+
+    pub.register = function(id, props)
+    {
+      if(items.hasOwnProperty(id)) { console.error("Can't reregister item."); return items[id]; }
+      else { var p = new plugin(props); items[id] = p; return p; }
+    }
+
+    pub.get = function(id)
+    {
+      if(items.hasOwnProperty(id)) { return items[id]; }
+      else { console.error("Item with ID `" + id + "` doesn't exist. Register your item before you use .get()"); return false; }
+    }
+
+    pub.delete = function(id)
+    {
+      if(items.hasOwnProperty(id)) { delete items[id]; return items.hasOwnProperty(id); }
+    }
+
+    pub.dump = function()
+    {
+      console.log(items);
+    }
+
+    return pub;
+  }
+  return manager;
+}(jQuery)));
