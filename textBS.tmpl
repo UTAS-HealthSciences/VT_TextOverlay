@@ -170,9 +170,15 @@ var textOverlay = (textOverlay !== undefined ? textOverlay : (function( $, undef
 
         //Apply the position
         $(textElem).css(cssPosition);
+<<<<<<< HEAD
 
         createStylesheet();
 
+=======
+
+        createStylesheet();
+
+>>>>>>> origin/master
         return $(textElem);
       }
       return $('#'+settings.id);
@@ -219,9 +225,13 @@ var textOverlay = (textOverlay !== undefined ? textOverlay : (function( $, undef
         rules += "}\n\n";
       });
 
+<<<<<<< HEAD
       if($('style#customtext').length == 0) { $("head").append("<style id='customtext'></style>"); }
       $('style#customtext').append(rules);
       // $("head").append("<style>"+rules+"</style>");
+=======
+      $("head").append("<style>"+rules+"</style>");
+>>>>>>> origin/master
     }
 
     return pub;
@@ -234,12 +244,16 @@ var textOverlay = (textOverlay !== undefined ? textOverlay : (function( $, undef
     pub.register = function(id, props)
     {
       if(items.hasOwnProperty(id)) { console.error("Can't reregister item."); return items[id]; }
+<<<<<<< HEAD
       else {
         if(props == 'undefined') { props = {}; }
         if(!props.hasOwnProperty('id')){ $.extend(props, {id:id}); }
         var p = new plugin(props);
         items[id] = p; return p;
       }
+=======
+      else { var p = new plugin(props); items[id] = p; return p; }
+>>>>>>> origin/master
     }
 
     pub.get = function(id)
