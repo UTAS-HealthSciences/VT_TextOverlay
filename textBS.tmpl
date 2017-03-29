@@ -219,7 +219,9 @@ var textOverlay = (textOverlay !== undefined ? textOverlay : (function( $, undef
         rules += "}\n\n";
       });
 
-      $("head").append("<style>"+rules+"</style>");
+      if($('style#customtext').length == 0) { $("head").append("<style id='customtext'></style>"); }
+      $('style#customtext').append(rules);
+      // $("head").append("<style>"+rules+"</style>");
     }
 
     return pub;
